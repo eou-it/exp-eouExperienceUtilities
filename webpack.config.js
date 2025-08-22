@@ -1,28 +1,34 @@
-const path = require('path')
-const { CleanWebpackPlugin } = require('clean-webpack-plugin')
-const nodeExternals = require('webpack-node-externals');
+const path = require('path');
 
 module.exports = {
-    mode: 'production',
-    stats: { colors: true },
-    entry: './src/index.js',
-    externals: [nodeExternals()],
-    output: {
-      filename: 'index.js',
-      path: path.resolve(__dirname, 'lib'),
-      library: {
-        type: 'commonjs'
-      }
+  entry: './src/components/index.js',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'index.js',
+    library: {
+      name: 'eouUtilities',
+      type: 'umd'
     },
-    plugins: [new CleanWebpackPlugin()],
-    module: {
-      rules: [
+    globalObject: 'this'
+  },
+  module: {
+    rules: [
       {
-          test: /\.(js|jsx)$/,
-          exclude: /node_modules/,
-          use: ['babel-loader']
-        }
-      ]
-    },
-    devtool: 'source-map'
-}
+        test: /\.(js|jsx)$/,
+        exclude: /node_modules/,
+        use: 'babel-loader'
+      }
+    ]
+  },
+  externals: {
+    react: 'react',
+    'react-dom': 'react-dom',
+    '@ellucian/react-design-system/core': '@ellucian/react-design-system/core',
+    '@ellucian/react-design-system/core/styles/tokens': '@ellucian/react-design-system/core/styles/tokens',
+    '@ellucian/experience-extension-utils': '@ellucian/experience-extension-utils'
+  },
+  resolve: {
+    extensions: ['.js', '.jsx']
+  },
+  mode: 'production'
+};
