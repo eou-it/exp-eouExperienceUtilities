@@ -6,7 +6,7 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     filename: 'index.js',
     library: {
-      name: 'eouUtilities',
+      name: 'eou-experience-utilities',
       type: 'umd'
     },
     globalObject: 'this'
