@@ -9,7 +9,7 @@ This repository is a collection of Experience Components to aid in the creation 
 ## Install
 
 ```
-npm install git+https://github.com/eou-it/exp-eouUtilities.git
+npm install git+https://github.com/eou-it/exp-eouExperienceUtilities.git
 ```
 
 
