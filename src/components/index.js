@@ -1,1 +1,1 @@
-export * from './UserLookup';
+export { default as UserLookup } from './UserLookup';
