@@ -1,0 +1,37 @@
+{
+  "name": "eou-get-gUserLookupMap",
+  "parameters": [
+    {
+      "name": "ethosApiKey",
+      "type": "string",
+      "required": true,
+      "sensitive": true
+    },
+    {
+      "name": "userSearchKey",
+      "type": "string"
+    }
+  ],
+  "apiDefinition": {
+    "authType": "userToken",
+    "httpVerb": "GET"
+  },
+  "pipeline": [
+    "Get Filtered User Lookup"
+  ],
+  "segments": {
+    "Get Filtered User Lookup": {
+      "class": "ethosProxyGetFilter",
+      "config": {
+        "resource": "x-getuserlookupmap",
+        "filter": "?criteria={\"usersearchkey\":{{context.userSearchKey}}}",
+        "acceptVersions": [
+          "1"
+        ],
+        "cache": false,
+        "queryByPost": false,
+        "ignoreErrors": false
+      }
+    }
+  }
+}

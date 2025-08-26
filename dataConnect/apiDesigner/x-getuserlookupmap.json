@@ -1,0 +1,115 @@
+{
+  "metaData": {
+    "description": "EOU User Lookup Map",
+    "domain": "BAN_EXTENSIONS",
+    "majorVersion": 1,
+    "resource": "x-getuserlookupmap",
+    "semanticVersion": "1.0.0",
+    "status": "DRAFT"
+  },
+  "query": {
+    "apiSpecificationId": "5b49f9f4-0691-4e6e-a542-6a6d065a9f28",
+    "databaseCompiledQueryId": "357b83c7-e57a-4215-9071-6eff95991fae",
+    "description": "EOU User Lookup Map",
+    "domain": "BAN_EXTENSIONS",
+    "entities": [
+      {
+        "name": "V_XG_USER_LOOKUP_MAP"
+      }
+    ],
+    "id": "dcb77c4a-4fa0-4273-8c47-ac43634bf213",
+    "idProperty": "",
+    "lastModified": "2025-08-20 20:12:28.0",
+    "lastModifiedBy": "910115703",
+    "maxPageSize": 500,
+    "metaData": {
+      "entities": [
+        {
+          "domain": "BAN_EXTENSIONS",
+          "domainType": "VIEW",
+          "entityName": "V_XG_USER_LOOKUP_MAP"
+        }
+      ]
+    },
+    "name": "x-getuserlookupmap",
+    "queryStatus": "PUBLISHED",
+    "schema": {
+      "userlastname": {
+        "nullable": "N",
+        "propertyName": "userlastname",
+        "entityName": "V_XG_USER_LOOKUP_MAP",
+        "dataScale": null,
+        "valueType": "COLUMN",
+        "length": 240,
+        "description": "USERLASTNAME",
+        "dataPrecision": null,
+        "label": "Userlastname",
+        "title": "USERLASTNAME",
+        "type": "string"
+      },
+      "userfirstname": {
+        "nullable": "Y",
+        "propertyName": "userfirstname",
+        "entityName": "V_XG_USER_LOOKUP_MAP",
+        "dataScale": null,
+        "valueType": "COLUMN",
+        "length": 240,
+        "description": "USERFIRSTNAME",
+        "dataPrecision": null,
+        "label": "Userfirstname",
+        "title": "USERFIRSTNAME",
+        "type": "string"
+      },
+      "usersearchkey": {
+        "nullable": "Y",
+        "propertyName": "usersearchkey",
+        "entityName": "V_XG_USER_LOOKUP_MAP",
+        "dataScale": null,
+        "valueType": "COLUMN",
+        "length": 120,
+        "description": "USERSEARCHKEY",
+        "dataPrecision": null,
+        "label": "Usersearchkey",
+        "title": "USERSEARCHKEY",
+        "type": "string"
+      },
+      "userid": {
+        "nullable": "N",
+        "propertyName": "userid",
+        "entityName": "V_XG_USER_LOOKUP_MAP",
+        "dataScale": null,
+        "valueType": "COLUMN",
+        "length": 36,
+        "description": "USERID",
+        "dataPrecision": null,
+        "label": "Userid",
+        "title": "USERID",
+        "type": "string"
+      }
+    },
+    "selects": [
+      {
+        "entityName": "V_XG_USER_LOOKUP_MAP",
+        "valueType": "COLUMN",
+        "name": "USERFIRSTNAME"
+      },
+      {
+        "entityName": "V_XG_USER_LOOKUP_MAP",
+        "valueType": "COLUMN",
+        "name": "USERID"
+      },
+      {
+        "entityName": "V_XG_USER_LOOKUP_MAP",
+        "valueType": "COLUMN",
+        "name": "USERLASTNAME"
+      },
+      {
+        "entityName": "V_XG_USER_LOOKUP_MAP",
+        "valueType": "COLUMN",
+        "name": "USERSEARCHKEY"
+      }
+    ],
+    "semanticVersion": "1.0.0",
+    "sysInd": "N"
+  }
+}
