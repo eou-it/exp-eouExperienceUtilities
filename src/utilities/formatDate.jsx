@@ -1,4 +1,4 @@
-function formatDateMMDDYYYY(inputDate) {
+export function formatDateMMDDYYYY(inputDate) {
 	if (!inputDate) return '';
 	const date = inputDate instanceof Date ? inputDate : new Date(inputDate);
 	if (isNaN(date)) return '';
