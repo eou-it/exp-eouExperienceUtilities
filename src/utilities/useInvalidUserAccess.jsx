@@ -6,7 +6,7 @@ import { submitGetRequest } from '../data/apiCalls';
 
 export function useInvalidUserAccess(pageName) {
 	const { cardId, cardConfiguration: { PIPELINE_GET_SDK_SECURITY } = {}, serverConfigContext: { cardPrefix } } = useCardInfo();
-	const packageName = cardId.split('|')[2] ?? '';
+	const moduleName = cardId.split('|')[2] ?? '';
 	const { authenticatedEthosFetch } = useData();
 	const userRoles = useUserInfo().roles;
 
@@ -15,7 +15,7 @@ export function useInvalidUserAccess(pageName) {
 	const urlSearchParameters = new URLSearchParams({
 		cardId,
 		cardPrefix,
-		packageName,
+		moduleName,
 		pageName
 	}).toString();
 
