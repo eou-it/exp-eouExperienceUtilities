@@ -1,9 +1,13 @@
+import { useEffect, useState, useCallback, useRef } from 'react';
+import { useData } from '@ellucian/experience-extension-utils';
 import log from 'loglevel';
 const logger = log.getLogger('default');
 
-export async function submitGetRequest({ PIPELINE_POST_API, authenticatedEthosFetch, urlSearchParameters }) {
-	logger.setLevel('debug');
-	const resource = PIPELINE_POST_API;
+/* *****************************************************************************************************************************************************************************/
+/*------------------------------------------------------------------ function submitGetRequest--------------------------------------------------------------------------------*/
+/* *****************************************************************************************************************************************************************************/
+export async function submitGetRequest({ PIPELINE_GET_API, authenticatedEthosFetch, urlSearchParameters }) {
+	const resource = PIPELINE_GET_API;
 	try {
 		const start = new Date();
 
@@ -18,7 +22,7 @@ export async function submitGetRequest({ PIPELINE_POST_API, authenticatedEthosFe
 		});
 
 		const end = new Date();
-		logger.debug(`post ${resource} time: ${end.getTime() - start.getTime()}`);
+		logger.debug(`get ${resource} time: ${end.getTime() - start.getTime()}`);
 
 		let result;
 		if (response) {
@@ -57,8 +61,82 @@ export async function submitGetRequest({ PIPELINE_POST_API, authenticatedEthosFe
 	}
 }
 
+/* *****************************************************************************************************************************************************************************/
+/*------------------------------------------------------------------ function useGetRequest--------------------------------------------------------------------------------*/
+/* *****************************************************************************************************************************************************************************/
+export function useGetRequest({ PIPELINE_GET_API, urlSearchParameters, enabled = true }) { // set false to disable when key is empty
+	const { authenticatedEthosFetch } = useData();
+	const mounted = useRef(true);
+	const [data, setData] = useState(undefined);
+	const [dataError, setDataError] = useState(undefined);
+	const [isLoading, setIsLoading] = useState(false);
+	const [isRefreshing, setIsRefreshing] = useState(false);
+	const refreshTickRef = useRef(0);
+
+	const doFetch = useCallback(async (isManualRefresh = false) => {
+		if (!enabled) return;
+		if (!PIPELINE_GET_API || !authenticatedEthosFetch) return;
+
+		try {
+			if (isManualRefresh) setIsRefreshing(true); else setIsLoading(true);
+
+			const result = await submitGetRequest({
+				PIPELINE_GET_API,
+				authenticatedEthosFetch,
+				urlSearchParameters
+			});
+
+			if (!mounted.current) return;
+
+			if (result?.status === 'success') {
+				setData(result.data);
+				setDataError(undefined);
+			} else {
+				setData(undefined);
+				setDataError(result?.error ?? { message: 'unknown error' });
+			}
+		} catch (err) {
+			if (!mounted.current) return;
+			setData(undefined);
+			setDataError({ message: String(err?.message ?? err), statusCode: err?.statusCode });
+		} finally {
+			setIsLoading(false);
+			setIsRefreshing(false);
+		}
+	}, [
+		enabled,
+		PIPELINE_GET_API,
+		authenticatedEthosFetch,
+		urlSearchParameters,
+	]);
+
+	// Auto fire on first mount & when inputs change
+	useEffect(() => {
+		mounted.current = true;
+		doFetch(false);
+		return () => { mounted.current = false; };
+	}, [doFetch]);
+
+	// Public manual refresh
+	const refresh = useCallback(() => {
+		refreshTickRef.current += 1;
+		void doFetch(true);
+	}, [doFetch]);
+
+	return {
+		data,
+		dataError,
+		isError: Boolean(dataError),
+		isLoading,
+		isRefreshing,
+		refresh
+	};
+}
+
+/* *****************************************************************************************************************************************************************************/
+/*------------------------------------------------------------------ function submitPostRequest--------------------------------------------------------------------------------*/
+/* *****************************************************************************************************************************************************************************/
 export async function submitPostRequest({ PIPELINE_POST_API, authenticatedEthosFetch, urlSearchParameters, request }) {
-	logger.setLevel('debug');
 	const resource = PIPELINE_POST_API;
 	try {
 		const start = new Date();
@@ -114,8 +192,10 @@ export async function submitPostRequest({ PIPELINE_POST_API, authenticatedEthosF
 	}
 }
 
+/* *****************************************************************************************************************************************************************************/
+/*------------------------------------------------------------------ function submitPutRequest--------------------------------------------------------------------------------*/
+/* *****************************************************************************************************************************************************************************/
 export async function submitPutRequest({ PIPELINE_PUT_API, authenticatedEthosFetch, urlSearchParameters, request }) {
-	logger.setLevel('debug');
 	const resource = PIPELINE_PUT_API;
 	try {
 		const start = new Date();
@@ -171,9 +251,10 @@ export async function submitPutRequest({ PIPELINE_PUT_API, authenticatedEthosFet
 	}
 }
 
-
+/* *****************************************************************************************************************************************************************************/
+/*------------------------------------------------------------------ function submitDeleteRequest--------------------------------------------------------------------------------*/
+/* *****************************************************************************************************************************************************************************/
 export async function submitDeleteRequest({ PIPELINE_DELETE_API, authenticatedEthosFetch, urlSearchParameters, request }) {
-	logger.setLevel('debug');
 	const resource = PIPELINE_DELETE_API;
 	try {
 		const start = new Date();

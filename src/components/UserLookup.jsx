@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import PropTypes from 'prop-types';
 import { CircularProgress, TextField, Typography, makeStyles } from '@ellucian/react-design-system/core';
 import { spacing20 } from '@ellucian/react-design-system/core/styles/tokens';
@@ -10,20 +10,20 @@ const useStyles = makeStyles(() => ({
 	userLookupSearch: {
 		margin: spacing20
 	},
-	userLookupText: {
-		margin: spacing20,
-		minHeight: '1.5rem',
-		minWidth: '50rem'
+	flexRow: {
+		display: 'flex',
+		alignItems: 'center',
+		gap: '16px', // or use spacing20 if you want consistency
 	},
-  flexRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '16px', // or use spacing20 if you want consistency
-  },
 	userLookupCircularProgress: {
-		size: '2rem'
+		size: '2rem',
+	},
+	userLookupResultDiv: {
+		padding: spacing20,
+		minHeight: '1.5rem',
+		minWidth: '40rem'
 	}
-}), { index: 2});
+}), { index: 2 });
 
 async function submitGetRequest({ PIPELINE_GET_API, authenticatedEthosFetch, cardId, cardPrefix, userSearchKey, signal }) {
 	const resource = PIPELINE_GET_API;
@@ -60,21 +60,20 @@ async function submitGetRequest({ PIPELINE_GET_API, authenticatedEthosFetch, car
 }
 
 function DisplayUserResult({ userArray, busy, userSearchKey }) {
-  const classes = useStyles();
-
+	const classes = useStyles();
 	if (busy) {
-		return (<CircularProgress className={classes.userLookupCircularProgress}/>);
-	} else if (userSearchKey < 4 ) {
-		return(<Typography className={classes.userLookupText}></Typography>);
+		return (<CircularProgress className={classes.userLookupCircularProgress} />);
+	} else if (!userSearchKey || userSearchKey < 4) {
+		return (<Typography className={classes.userLookupText}></Typography>);
 	} else if (userArray && Array.isArray(userArray)) {
 		if (userArray.length === 1) {
 			const user = userArray[0];
-			return(<Typography className={classes.userLookupText}>{user.userfirstname} {user.userlastname}</Typography>);
+			return (<Typography className={classes.userLookupText}>{user.userfirstname} {user.userlastname}</Typography>);
 		} else {
-			return(<Typography className={classes.userLookupText}></Typography>);
+			return (<Typography className={classes.userLookupText}></Typography>);
 		}
 	} else {
-		return(<Typography className={classes.userLookupText}></Typography>);
+		return (<Typography className={classes.userLookupText}></Typography>);
 	}
 }
 
@@ -84,32 +83,68 @@ DisplayUserResult.propTypes = {
 	userSearchKey: PropTypes.string
 };
 
-export default function UserLookup({ userGuid, setUserId, setUserFirstName, setUserLastName }) {
-  const classes = useStyles();
+const UserLookup = forwardRef(function UserLookup(
+	{ userGuid, setUserId, setUserFirstName, setUserLastName, onCleared },
+	ref
+) {
+	const classes = useStyles();
 
 	const {
-			cardConfiguration: {
-					PIPELINE_GET_USER_MAP
-			} = {}
+		cardConfiguration: {
+			PIPELINE_GET_USER_MAP
+		} = {}
 	} = useCardInfo();
 
 	const { authenticatedEthosFetch } = useData();
 	const { serverConfigContext: { cardPrefix }, cardId } = useCardInfo();
-	
-	const [ busy, setBusy ] = useState(false);
-	const [ busyUntilRefresh, setBusyUntilRefresh ] = useState(false);
+
+	const [busy, setBusy] = useState(false);
+	const [busyUntilRefresh, setBusyUntilRefresh] = useState(false);
 
 	useEffect(() => {
 		if (busy && !busyUntilRefresh) {
 			setBusy(false);
 		}
 	}, [busy, busyUntilRefresh]);
-	
-	const [ search, setSearch ] = useState('');
-	const [ userArray, setUserArray ] = useState([]);
+
+	const [search, setSearch] = useState('');
+	const [userArray, setUserArray] = useState([]);
 	const userSearchKey = search.toLowerCase().trim().replace(/@eou\.edu/i, '');
 
+	useImperativeHandle(ref, () => ({
+		clear: () => {
+			setSearch('');
+			setUserArray([]);
+			// ensure parent mirrors cleared state
+			if (userGuid) {
+				setUserId(userGuid, '');
+				setUserFirstName(userGuid, '');
+				setUserLastName(userGuid, '');
+			} else {
+				setUserId('');
+				setUserFirstName('');
+				setUserLastName('');
+			}
+			if (typeof onCleared === 'function') onCleared();
+		},
+		setSearchValue: (value) => {
+			setSearch(value ?? '');
+		}
+	}), [setUserFirstName, setUserId, setUserLastName, userGuid, onCleared]);
+
 	function handleUserSearchChange(searchValue) {
+		//clear all previous values
+		setUserArray([]);
+		if (userGuid) {
+			setUserId(userGuid, '');
+			setUserFirstName(userGuid, '');
+			setUserLastName(userGuid, '');
+		} else {
+			setUserId('');
+			setUserFirstName('');
+			setUserLastName('');
+		}
+		//set the new value so it triggers the search
 		setSearch(searchValue);
 	}
 
@@ -119,6 +154,7 @@ export default function UserLookup({ userGuid, setUserId, setUserFirstName, setU
 		const controller = new AbortController();
 
 		const getData = async () => {
+			setBusyUntilRefresh(true);
 			setBusy(true);
 			const result = await submitGetRequest({
 				PIPELINE_GET_API: PIPELINE_GET_USER_MAP,
@@ -135,7 +171,7 @@ export default function UserLookup({ userGuid, setUserId, setUserFirstName, setU
 				} else {
 					console.error('Fetch failed or server error');
 				}
-				setBusy(false);
+				setBusyUntilRefresh(false);
 			}
 		};
 
@@ -154,9 +190,9 @@ export default function UserLookup({ userGuid, setUserId, setUserFirstName, setU
 				setUserFirstName(userGuid, user.userfirstname);
 				setUserLastName(userGuid, user.userlastname);
 			} else {
-				setUserId(userGuid,'');
-				setUserFirstName(userGuid,'');
-				setUserLastName(userGuid,'');
+				setUserId(userGuid, '');
+				setUserFirstName(userGuid, '');
+				setUserLastName(userGuid, '');
 			}
 		} else {
 			if (userArray.length === 1) {
@@ -175,28 +211,34 @@ export default function UserLookup({ userGuid, setUserId, setUserFirstName, setU
 	return (
 		<div className={classes.flexRow}>
 			<TextField
-					inputProps={{'aria-label': 'Search for a user'}}
-					id={`userSearch${userGuid}`}
-					name={`userSearch${userGuid}`}
-					onChange={(e) => handleUserSearchChange(e.target.value)}
-					placeholder="mmonty or 910000000"
-					value={search}
-					className={classes.userLookupSearch}
+				inputProps={{ 'aria-label': 'Search for a user' }}
+				id={`userSearch${userGuid}`}
+				name={`userSearch${userGuid}`}
+				onChange={(e) => handleUserSearchChange(e.target.value)}
+				placeholder="mmonty or 910000000"
+				value={search}
+				className={classes.userLookupSearch}
 			/>
-			<DisplayUserResult userArray={userArray} busy={busy} userSearchKey={userSearchKey}/>
+			<div className={classes.userLookupResultDiv}>
+				<DisplayUserResult userArray={userArray} busy={busy} userSearchKey={userSearchKey} />
+			</div>
 		</div>
 	)
-}
+});
 
 UserLookup.propTypes = {
 	userGuid: PropTypes.string,
 	setUserId: PropTypes.func,
 	setUserFirstName: PropTypes.func,
-	setUserLastName: PropTypes.func
+	setUserLastName: PropTypes.func,
+	onCleareed: PropTypes.func
 };
 
 UserLookup.defaultProps = {
-	setUserId: () => {},
-	setUserFirstName: () => {},
-	setUserLastName: () => {}
+	setUserId: () => { },
+	setUserFirstName: () => { },
+	setUserLastName: () => { },
+	onCleareed: () => { }
 };
+
+export default UserLookup;
