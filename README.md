@@ -69,7 +69,7 @@ export default function EouSdkSecurity() {
 }
 ```
 5. Go to the SDK Security Management card/page.
-6. Click `Add Module` and added your module, the *Module Name* should match you module name in your extensions.js file, usually like 2.
+6. Click `Add Module` and added your module, the *Module Name* should match you module name in your extensions.js file, usually line 2.
 7. Click `Add Page` add your page, this shoudl match the name you pass when you call `useInvalidUserAccess`. 
 8. Add the roles that should have access to your page.
 9. Repeated steps 7 and 8 for each of your pages.
