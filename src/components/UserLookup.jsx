@@ -1,30 +1,27 @@
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import PropTypes from 'prop-types';
-import { CircularProgress, TextField, Typography, makeStyles } from '@ellucian/react-design-system/core';
+import { CircularProgress, TextField, Typography, makeStyles, Grid } from '@ellucian/react-design-system/core';
 import { spacing20 } from '@ellucian/react-design-system/core/styles/tokens';
 
 import { useCardInfo, useData } from '@ellucian/experience-extension-utils';
 
-
 const useStyles = makeStyles(() => ({
 	userLookupSearch: {
-		margin: spacing20
-	},
-	flexRow: {
-		display: 'flex',
-		alignItems: 'center',
-		gap: '16px', // or use spacing20 if you want consistency
-	},
-	userLookupCircularProgress: {
-		size: '2rem',
+		marginRight: spacing20,
+		width: '100%'
 	},
 	userLookupResultDiv: {
+		display: "flex",
 		padding: spacing20,
-		minHeight: '1.5rem',
-		minWidth: '40rem'
+		minHeight: '3rem',
+		width: '100%',
+		alignItems: "center"
 	}
 }), { index: 2 });
 
+/* *****************************************************************************************************************************************************************************/
+/*------------------------------------------------------------------ function submitGetRequest--------------------------------------------------------------------------------*/
+/* *****************************************************************************************************************************************************************************/
 async function submitGetRequest({ PIPELINE_GET_API, authenticatedEthosFetch, cardId, cardPrefix, userSearchKey, signal }) {
 	const resource = PIPELINE_GET_API;
 
@@ -59,21 +56,23 @@ async function submitGetRequest({ PIPELINE_GET_API, authenticatedEthosFetch, car
 	}
 }
 
+/* *****************************************************************************************************************************************************************************/
+/*------------------------------------------------------------------ function DisplayUserResult--------------------------------------------------------------------------------*/
+/* *****************************************************************************************************************************************************************************/
 function DisplayUserResult({ userArray, busy, userSearchKey }) {
-	const classes = useStyles();
 	if (busy) {
-		return (<CircularProgress className={classes.userLookupCircularProgress} />);
+		return (<CircularProgress size='2rem' />);
 	} else if (!userSearchKey || userSearchKey < 4) {
-		return (<Typography className={classes.userLookupText}></Typography>);
+		return null;
 	} else if (userArray && Array.isArray(userArray)) {
 		if (userArray.length === 1) {
 			const user = userArray[0];
-			return (<Typography className={classes.userLookupText}>{user.userfirstname} {user.userlastname}</Typography>);
+			return (<Typography variant="body1">{user.userfirstname} {user.userlastname}</Typography>);
 		} else {
-			return (<Typography className={classes.userLookupText}></Typography>);
+			return null;
 		}
 	} else {
-		return (<Typography className={classes.userLookupText}></Typography>);
+		return null;
 	}
 }
 
@@ -83,17 +82,23 @@ DisplayUserResult.propTypes = {
 	userSearchKey: PropTypes.string
 };
 
+/* *****************************************************************************************************************************************************************************/
+/*------------------------------------------------------------------ function UserLookup--------------------------------------------------------------------------------*/
+/* *****************************************************************************************************************************************************************************/
 const UserLookup = forwardRef(function UserLookup(
 	{ userGuid, setUserId, setUserFirstName, setUserLastName, onCleared },
 	ref
 ) {
 	const classes = useStyles();
 
+	const { configuration, cardConfiguration } = useCardInfo() ?? {};
+	const config = configuration || cardConfiguration || {};
+
+	const isCard = (configuration) ? true : false;
+
 	const {
-		cardConfiguration: {
-			PIPELINE_GET_USER_MAP
-		} = {}
-	} = useCardInfo();
+		PIPELINE_GET_USER_MAP
+	} = config;
 
 	const { authenticatedEthosFetch } = useData();
 	const { serverConfigContext: { cardPrefix }, cardId } = useCardInfo();
@@ -209,20 +214,24 @@ const UserLookup = forwardRef(function UserLookup(
 	}, [userArray, userGuid, setUserId, setUserFirstName, setUserLastName]);
 
 	return (
-		<div className={classes.flexRow}>
-			<TextField
-				inputProps={{ 'aria-label': 'Search for a user' }}
-				id={`userSearch${userGuid}`}
-				name={`userSearch${userGuid}`}
-				onChange={(e) => handleUserSearchChange(e.target.value)}
-				placeholder="mmonty or 910000000"
-				value={search}
-				className={classes.userLookupSearch}
-			/>
-			<div className={classes.userLookupResultDiv}>
-				<DisplayUserResult userArray={userArray} busy={busy} userSearchKey={userSearchKey} />
-			</div>
-		</div>
+		<Grid container spacing={2}>
+			<Grid item xs={12} lg={isCard ? 12 : 5}>
+				<TextField
+					inputProps={{ 'aria-label': 'Search for a user' }}
+					id={`userSearch${userGuid}`}
+					name={`userSearch${userGuid}`}
+					onChange={(e) => handleUserSearchChange(e.target.value)}
+					placeholder="mmonty or 910000000"
+					value={search}
+					className={classes.userLookupSearch}
+				/>
+			</Grid>
+			<Grid item xs={12} lg={isCard ? 12 : 7}>
+				<div className={classes.userLookupResultDiv}>
+					<DisplayUserResult userArray={userArray} busy={busy} userSearchKey={userSearchKey} />
+				</div>
+			</Grid>
+		</Grid>
 	)
 });
 
@@ -231,14 +240,14 @@ UserLookup.propTypes = {
 	setUserId: PropTypes.func,
 	setUserFirstName: PropTypes.func,
 	setUserLastName: PropTypes.func,
-	onCleareed: PropTypes.func
+	onCleared: PropTypes.func
 };
 
 UserLookup.defaultProps = {
 	setUserId: () => { },
 	setUserFirstName: () => { },
 	setUserLastName: () => { },
-	onCleareed: () => { }
+	onCleared: () => { }
 };
 
 export default UserLookup;
