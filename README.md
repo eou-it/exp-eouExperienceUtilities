@@ -44,22 +44,20 @@ export default function EouSdkSecurity() {
 				iconColor: colorFillAlertError
 			});
 		}
-	}, [accessError, setErrorMessage]);if (accessIsLoading) {
+	}, [accessError, setErrorMessage]);
+	
+	if (accessIsLoading) {
 		return (
-			<div className={classes.root}>
-				<div className={classes.spinnerBox}>
-					<CircularProgress />
-				</div>
+			<div style={{ display: 'flex', justifyContent: 'center', height: '100%', flex: '1 0 70%', alignItems: 'center', width: '100%' }}>
+				<CircularProgress />
 			</div>
 		);
 	} else if (accessIsInvalid) {
 		return (
-			<div className={classes.root}>
-				<div style={{ display: 'flex', justifyContent: 'center', marginTop: '10rem' }}>
-					<div style={{ textAlign: 'center' }}>
-						<Typography variant="h2">You are not authorized to access this page</Typography>
-						<Typography variant="body1">If you believe this is incorrect please submit a ticket to EOU IT by emailing infosys@eou.edu</Typography>
-					</div>
+			<div style={{ display: 'flex', justifyContent: 'center', height: '100%', flex: '1 0 70%', alignItems: 'center', width: '100%' }}>
+				<div style={{ textAlign: 'center' }}>
+					<Typography variant="h2">You are not authorized to access this page</Typography>
+					<Typography variant="body1">If you believe this is incorrect please submit a ticket to EOU IT by emailing infosys@eou.edu</Typography>
 				</div>
 			</div>
 		);
