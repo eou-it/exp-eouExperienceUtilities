@@ -1,8 +1,19 @@
 
 export const toMonthStart = (d) => new Date(d.getFullYear(), d.getMonth(), 1);
 export const toMonthEnd = (d) => new Date(d.getFullYear(), d.getMonth() + 1, 0);
-export const toEllucianApiDateFormat = (date, offset = "+07:00") => `${date.toISOString().replace(/\.\d{3}Z$/, '')}${offset}`;
 export const addMonths = (d, n) => new Date(d.getFullYear(), d.getMonth() + n, 1);
+
+/* *****************************************************************************************************************************************************************************/
+/*------------------------------------------------------------------ function toEllucianApiDateFormat ---------------------------------------------------------------------------*/
+/* *****************************************************************************************************************************************************************************/
+export function toEllucianApiDateFormat(inputDate) {
+	if (!inputDate) return '';
+
+	const date = inputDate instanceof Date ? inputDate : new Date(inputDate);
+	if (isNaN(date)) return '';
+
+	return `${inputDate.toISOString().replace(/\.\d{3}Z$/, '')}+07:00`;
+}
 
 /* *****************************************************************************************************************************************************************************/
 /*------------------------------------------------------------------ function formatDateMonthYYYY ---------------------------------------------------------------------------*/
