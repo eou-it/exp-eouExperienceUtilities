@@ -8,11 +8,20 @@ export const addMonths = (d, n) => new Date(d.getFullYear(), d.getMonth() + n, 1
 /* *****************************************************************************************************************************************************************************/
 export function toEllucianApiDateFormat(inputDate) {
 	if (!inputDate) return '';
+	const d = inputDate instanceof Date ? inputDate : new Date(inputDate);
+	if (Number.isNaN(d.getTime())) return '';
 
-	const date = inputDate instanceof Date ? inputDate : new Date(inputDate);
-	if (isNaN(date)) return '';
+	// Get the local fields (ignore timezone)
+	const year = d.getFullYear();
+	const month = d.getMonth() + 1;
+	const day = d.getDate();
+	const hour = d.getHours();
+	const minute = d.getMinutes();
+	const second = d.getSeconds();
 
-	return `${inputDate.toISOString().replace(/\.\d{3}Z$/, '')}+07:00`;
+	// Build string pretending these are UTC values
+	const pad = (n) => String(n).padStart(2, '0');
+	return `${year}-${pad(month)}-${pad(day)}T${pad(hour)}:${pad(minute)}:${pad(second)}Z`;
 }
 
 /* *****************************************************************************************************************************************************************************/
