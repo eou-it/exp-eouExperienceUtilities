@@ -1,4 +1,4 @@
-import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
+import React, { useState, useEffect, forwardRef, useImperativeHandle, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { CircularProgress, TextField, Typography, makeStyles, Grid } from '@ellucian/react-design-system/core';
 import { spacing20 } from '@ellucian/react-design-system/core/styles/tokens';
@@ -62,7 +62,7 @@ async function submitGetRequest({ PIPELINE_GET_API, authenticatedEthosFetch, car
 function DisplayUserResult({ userArray, busy, userSearchKey }) {
 	if (busy) {
 		return (<CircularProgress size='2rem' />);
-	} else if (!userSearchKey || userSearchKey < 4) {
+	} else if (!userSearchKey || userSearchKey.length < 4) {
 		return null;
 	} else if (userArray && Array.isArray(userArray)) {
 		if (userArray.length === 1) {
@@ -115,6 +115,7 @@ const UserLookup = forwardRef(function UserLookup(
 	const [search, setSearch] = useState('');
 	const [userArray, setUserArray] = useState([]);
 	const userSearchKey = search.toLowerCase().trim().replace(/@eou\.edu/i, '');
+	const lastEmitted = useRef({ guid: undefined, id: undefined, first: undefined, last: undefined });
 
 	useImperativeHandle(ref, () => ({
 		clear: () => {
@@ -136,6 +137,22 @@ const UserLookup = forwardRef(function UserLookup(
 			setSearch(value ?? '');
 		}
 	}), [setUserFirstName, setUserId, setUserLastName, userGuid, onCleared]);
+
+	const emitToParentIfChanged = useCallback((guid, id, first, last) => {
+		const prev = lastEmitted.current;
+		// if nothing changed, do nothing
+		if (prev.guid === guid && prev.id === id && prev.first === first && prev.last === last) return;
+		lastEmitted.current = { guid, id, first, last };
+		if (guid) {
+			setUserId(guid, id);
+			setUserFirstName(guid, first);
+			setUserLastName(guid, last);
+		} else {
+			setUserId(id);
+			setUserFirstName(first);
+			setUserLastName(last);
+		}
+	}, [setUserId, setUserFirstName, setUserLastName]);
 
 	function handleUserSearchChange(searchValue) {
 		//clear all previous values
@@ -188,30 +205,12 @@ const UserLookup = forwardRef(function UserLookup(
 	}, [PIPELINE_GET_USER_MAP, authenticatedEthosFetch, cardId, cardPrefix, setBusy, setBusyUntilRefresh, userSearchKey]); // will trigger when search changes
 
 	useEffect(() => {
-		if (userGuid) {
-			if (userArray.length === 1) {
-				const user = userArray[0];
-				setUserId(userGuid, user.userid);
-				setUserFirstName(userGuid, user.userfirstname);
-				setUserLastName(userGuid, user.userlastname);
-			} else {
-				setUserId(userGuid, '');
-				setUserFirstName(userGuid, '');
-				setUserLastName(userGuid, '');
-			}
-		} else {
-			if (userArray.length === 1) {
-				const user = userArray[0];
-				setUserId(user.userid);
-				setUserFirstName(user.userfirstname);
-				setUserLastName(user.userlastname);
-			} else {
-				setUserId('');
-				setUserFirstName('');
-				setUserLastName('');
-			}
-		}
-	}, [userArray, userGuid, setUserId, setUserFirstName, setUserLastName]);
+		const user = userArray.length === 1 ? userArray[0] : null;
+		const id = user ? user.userid : '';
+		const first = user ? user.userfirstname : '';
+		const last = user ? user.userlastname : '';
+		emitToParentIfChanged(userGuid, id, first, last);
+	}, [userArray, userGuid, emitToParentIfChanged]);
 
 	return (
 		<Grid container spacing={2}>
@@ -220,7 +219,7 @@ const UserLookup = forwardRef(function UserLookup(
 					inputProps={{ 'aria-label': 'Search for a user' }}
 					id={`userSearch${userGuid}`}
 					name={`userSearch${userGuid}`}
-					onChange={(e) => handleUserSearchChange(e.target.value)}
+					onChange={(e) => setSearch(e.target.value)}
 					placeholder="mmonty or 910000000"
 					value={search}
 					className={classes.userLookupSearch}
