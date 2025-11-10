@@ -15,7 +15,7 @@ npm install git+https://github.com/eou-it/exp-eouExperienceUtilities.git
 ## Build & Publish
 - npm install  # install dependencies (first time only, or if new dependencies are added/chanaged)
 - npm run build
-- To test locally, use `npm pack` then in another project `npm install ../exp-eouExperienceUtilities/eou-experience-utilities-1.0.13.tgz`
+- To test locally, use `npm pack` then in another project `npm install ../exp-eouExperienceUtilities/eou-experience-utilities-1.0.14.tgz`
 - npm login (Password is in Password book under NPM)
 - npm publish
 

@@ -11,17 +11,7 @@ export function toEllucianApiDateFormat(inputDate) {
 	const d = inputDate instanceof Date ? inputDate : new Date(inputDate);
 	if (Number.isNaN(d.getTime())) return '';
 
-	// Get the local fields (ignore timezone)
-	const year = d.getFullYear();
-	const month = d.getMonth() + 1;
-	const day = d.getDate();
-	const hour = d.getHours();
-	const minute = d.getMinutes();
-	const second = d.getSeconds();
-
-	// Build string pretending these are UTC values
-	const pad = (n) => String(n).padStart(2, '0');
-	return `${year}-${pad(month)}-${pad(day)}T${pad(hour)}:${pad(minute)}:${pad(second)}Z`;
+	return inputDate.toISOString().split('.')[0] + 'Z';
 }
 
 /* *****************************************************************************************************************************************************************************/
