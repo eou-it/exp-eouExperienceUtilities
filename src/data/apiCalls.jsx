@@ -4,44 +4,6 @@ import log from 'loglevel';
 const logger = log.getLogger('default');
 
 /* *****************************************************************************************************************************************************************************/
-/*------------------------------------------------------------------ function parseResponse--------------------------------------------------------------------------------*/
-/* *****************************************************************************************************************************************************************************/
-async function parseResponse(response) {
-	let result;
-	if (response) {
-		switch (response.status) {
-			case 403:
-				result = {
-					statusCode: 403,
-					error: {
-						message: 'Access is Forbidden',
-					}
-				};
-				break;
-			default:
-				try {
-					const data = await response.json();
-
-					result = {
-						data,
-						statusCode: response.status,
-						...(response.status === 200 && { status: 'success' })
-					};
-				} catch (error) {
-					result = {
-						statusCode: 500,
-						error: {
-							message: 'unable to parse response',
-						}
-					};
-				}
-		}
-	}
-
-	return result;
-}
-
-/* *****************************************************************************************************************************************************************************/
 /*------------------------------------------------------------------ function submitGetRequest--------------------------------------------------------------------------------*/
 /* *****************************************************************************************************************************************************************************/
 export async function submitGetRequest({ PIPELINE_GET_API, authenticatedEthosFetch, urlSearchParameters }) {
@@ -62,9 +24,39 @@ export async function submitGetRequest({ PIPELINE_GET_API, authenticatedEthosFet
 		const end = new Date();
 		logger.debug(`get ${resource} time: ${end.getTime() - start.getTime()}`);
 
-		return parseResponse(response);
+		let result;
+		if (response) {
+			switch (response.status) {
+				case 200:
+					try {
+						const data = await response.json();
+
+						result = {
+							data,
+							status: 'success'
+						};
+					} catch (error) {
+						result = {
+							error: {
+								message: 'unable to parse response',
+								statusCode: 500
+							}
+						};
+					}
+					break;
+				default:
+					result = {
+						error: {
+							message: 'server error',
+							statusCode: response.status
+						}
+					};
+			}
+		}
+
+		return result;
 	} catch (error) {
-		logger.error('failed to perform get request: ', error);
+		logger.error('unable to search for persons: ', error);
 		throw error;
 	}
 }
@@ -163,9 +155,39 @@ export async function submitPostRequest({ PIPELINE_POST_API, authenticatedEthosF
 		const end = new Date();
 		logger.debug(`post ${resource} time: ${end.getTime() - start.getTime()}`);
 
-		return parseResponse(response);
+		let result;
+		if (response) {
+			switch (response.status) {
+				case 200:
+					try {
+						const data = await response.json();
+
+						result = {
+							data,
+							status: 'success'
+						};
+					} catch (error) {
+						result = {
+							error: {
+								message: 'unable to parse response',
+								statusCode: 500
+							}
+						};
+					}
+					break;
+				default:
+					result = {
+						error: {
+							message: 'server error',
+							statusCode: response.status
+						}
+					};
+			}
+		}
+
+		return result;
 	} catch (error) {
-		logger.error('failed to perform post request: ', error);
+		logger.error('unable to search for persons: ', error);
 		throw error;
 	}
 }
@@ -192,9 +214,39 @@ export async function submitPutRequest({ PIPELINE_PUT_API, authenticatedEthosFet
 		const end = new Date();
 		logger.debug(`put ${resource} time: ${end.getTime() - start.getTime()}`);
 
-		return parseResponse(response);
+		let result;
+		if (response) {
+			switch (response.status) {
+				case 200:
+					try {
+						const data = await response.json();
+
+						result = {
+							data,
+							status: 'success'
+						};
+					} catch (error) {
+						result = {
+							error: {
+								message: 'unable to parse response',
+								statusCode: 500
+							}
+						};
+					}
+					break;
+				default:
+					result = {
+						error: {
+							message: 'server error',
+							statusCode: response.status
+						}
+					};
+			}
+		}
+
+		return result;
 	} catch (error) {
-		logger.error('failed to perform put request: ', error);
+		logger.error('unable to search for persons: ', error);
 		throw error;
 	}
 }
@@ -221,9 +273,39 @@ export async function submitDeleteRequest({ PIPELINE_DELETE_API, authenticatedEt
 		const end = new Date();
 		logger.debug(`delete ${resource} time: ${end.getTime() - start.getTime()}`);
 
-		return parseResponse(response);
+		let result;
+		if (response) {
+			switch (response.status) {
+				case 200:
+					try {
+						const data = await response.json();
+
+						result = {
+							data,
+							status: 'success'
+						};
+					} catch (error) {
+						result = {
+							error: {
+								message: 'unable to parse response',
+								statusCode: 500
+							}
+						};
+					}
+					break;
+				default:
+					result = {
+						error: {
+							message: 'server error',
+							statusCode: response.status
+						}
+					};
+			}
+		}
+
+		return result;
 	} catch (error) {
-		logger.error('failed to perform delete request: ', error);
+		logger.error('unable to search for persons: ', error);
 		throw error;
 	}
 }
