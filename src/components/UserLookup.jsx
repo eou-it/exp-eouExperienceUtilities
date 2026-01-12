@@ -86,7 +86,7 @@ DisplayUserResult.propTypes = {
 /*------------------------------------------------------------------ function UserLookup--------------------------------------------------------------------------------*/
 /* *****************************************************************************************************************************************************************************/
 const UserLookup = forwardRef(function UserLookup(
-	{ userGuid, setUserId, setUserFirstName, setUserLastName, onCleared },
+	{ userGuid, setUserId, setUserFirstName, setUserLastName, label, onCleared, required },
 	ref
 ) {
 	const classes = useStyles();
@@ -219,10 +219,12 @@ const UserLookup = forwardRef(function UserLookup(
 					inputProps={{ 'aria-label': 'Search for a user' }}
 					id={`userSearch${userGuid}`}
 					name={`userSearch${userGuid}`}
+					label={label || ''}
 					onChange={(e) => setSearch(e.target.value)}
 					placeholder="mmonty or 910000000"
 					value={search}
 					className={classes.userLookupSearch}
+					required={required}
 				/>
 			</Grid>
 			<Grid item xs={12} lg={isCard ? 12 : 7}>
@@ -239,14 +241,17 @@ UserLookup.propTypes = {
 	setUserId: PropTypes.func,
 	setUserFirstName: PropTypes.func,
 	setUserLastName: PropTypes.func,
-	onCleared: PropTypes.func
+	label: PropTypes.string,
+	onCleared: PropTypes.func,
+	required: PropTypes.bool
 };
 
 UserLookup.defaultProps = {
 	setUserId: () => { },
 	setUserFirstName: () => { },
 	setUserLastName: () => { },
-	onCleared: () => { }
+	onCleared: () => { },
+	required: false
 };
 
 export default UserLookup;
