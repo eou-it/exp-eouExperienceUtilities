@@ -86,7 +86,7 @@ DisplayUserResult.propTypes = {
 /*------------------------------------------------------------------ function UserLookup--------------------------------------------------------------------------------*/
 /* *****************************************************************************************************************************************************************************/
 const UserLookup = forwardRef(function UserLookup(
-	{ userGuid, setUserId, setUserFirstName, setUserLastName, label, onCleared, required },
+	{ userGuid, setUserId, setUserFirstName, setUserLastName, label, onCleared, required, id },
 	ref
 ) {
 	const classes = useStyles();
@@ -217,8 +217,8 @@ const UserLookup = forwardRef(function UserLookup(
 			<Grid item xs={12} lg={isCard ? 12 : 5}>
 				<TextField
 					inputProps={{ 'aria-label': 'Search for a user' }}
-					id={`userSearch${userGuid}`}
-					name={`userSearch${userGuid}`}
+					id={`userSearch${userGuid}${id}`}
+					name={`userSearch${userGuid}${id}`}
 					label={label || ''}
 					onChange={(e) => setSearch(e.target.value)}
 					placeholder="mmonty or 910000000"
