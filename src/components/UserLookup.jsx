@@ -86,7 +86,7 @@ DisplayUserResult.propTypes = {
 /*------------------------------------------------------------------ function UserLookup--------------------------------------------------------------------------------*/
 /* *****************************************************************************************************************************************************************************/
 const UserLookup = forwardRef(function UserLookup(
-	{ userGuid, setUserId, setUserFirstName, setUserLastName, label, onCleared, required, id },
+	{ initialSearchValue, userGuid, setUserId, setUserFirstName, setUserLastName, label, onCleared, required, id },
 	ref
 ) {
 	const classes = useStyles();
@@ -112,7 +112,7 @@ const UserLookup = forwardRef(function UserLookup(
 		}
 	}, [busy, busyUntilRefresh]);
 
-	const [search, setSearch] = useState('');
+	const [search, setSearch] = useState(initialSearchValue || '');
 	const [userArray, setUserArray] = useState([]);
 	const userSearchKey = search.toLowerCase().trim().replace(/@eou\.edu/i, '');
 	const lastEmitted = useRef({ guid: undefined, id: undefined, first: undefined, last: undefined });
