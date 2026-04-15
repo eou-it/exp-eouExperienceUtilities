@@ -86,7 +86,7 @@ DisplayUserResult.propTypes = {
 /*------------------------------------------------------------------ function UserLookup--------------------------------------------------------------------------------*/
 /* *****************************************************************************************************************************************************************************/
 const UserLookup = forwardRef(function UserLookup(
-	{ initialSearchValue, userGuid, setUserId, setUserFirstName, setUserLastName, label, onCleared, required, id },
+	{ initialSearchValue, userGuid, setUserId = () => { }, setUserFirstName = () => { }, setUserLastName = () => { }, label, onCleared, required, id },
 	ref
 ) {
 	const classes = useStyles();
